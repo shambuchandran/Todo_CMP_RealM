@@ -23,8 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import domain.TaskAction
 import domain.TodoTask
 
 const val DEFAULT_TITLE = "Enter the Title"
@@ -35,6 +37,7 @@ data class TaskScreen(val task: TodoTask? = null) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val viewModel = koinScreenModel<TaskViewModel>()
         var currentTitle by remember { mutableStateOf(task?.title ?: DEFAULT_TITLE) }
         var currentDescription by remember {
             mutableStateOf(
@@ -71,8 +74,24 @@ data class TaskScreen(val task: TodoTask? = null) : Screen {
                     FloatingActionButton(
                         onClick = {
                             if (task != null) {
-                                //Todo
+                                viewModel.setAction(
+                                    action = TaskAction.Update(
+                                        TodoTask().apply {
+                                            _id = task._id
+                                            title = currentTitle
+                                            description = currentDescription
+                                        }
+                                    )
+                                )
                             } else {
+                                viewModel.setAction(
+                                    action = TaskAction.Add(
+                                        TodoTask().apply {
+                                            title = currentTitle
+                                            description = currentDescription
+                                        }
+                                    )
+                                )
 
                             }
                             navigator.pop()

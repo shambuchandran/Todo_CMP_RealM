@@ -14,6 +14,6 @@ fun ErrorScreen(message: String) {
     Box(
         modifier = Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center
     ) {
-        Text(text = message ?: "Empty")
+        Text(text = message)
     }
 }

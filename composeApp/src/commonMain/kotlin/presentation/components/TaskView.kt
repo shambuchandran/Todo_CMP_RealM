@@ -60,7 +60,7 @@ fun TaskView(
             Icon(
                 painter = painterResource(if (showActive) Res.drawable.baseline_star_24 else Res.drawable.baseline_delete_24),
                 contentDescription = "Favorite",
-                tint = if (task.favorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(
+                tint = if (task.favorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(
                     alpha = 0.38f
                 )
             )

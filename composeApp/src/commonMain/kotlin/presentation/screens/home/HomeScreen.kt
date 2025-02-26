@@ -29,11 +29,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import domain.RequestState
+import domain.TaskAction
 import domain.TodoTask
 import presentation.components.ErrorScreen
 import presentation.components.LoadingScreen
@@ -47,7 +48,7 @@ class HomeScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val viewModel = rememberScreenModel<HomeViewModel>()
+        val viewModel =koinScreenModel<HomeViewModel>()
         val activeTask by viewModel.activeTasks
         val completedTask by viewModel.completedTasks
         Scaffold(
@@ -75,16 +76,32 @@ class HomeScreen : Screen {
                     onSelect = {selectedTask ->
                         navigator.push(TaskScreen(selectedTask))
                     },
-                    onFavorite = {task,isFavorite ->},
-                    onComplete = {task, completed ->}
+                    onFavorite = {task,isFavorite ->
+                        viewModel.setAction(
+                            action = TaskAction.SetFavorite(task,isFavorite)
+                        )
+                    },
+                    onComplete = {task, completed ->
+                        viewModel.setAction(
+                            action = TaskAction.SetCompleted(task,completed)
+                        )
+                    }
                 )
                 Spacer(Modifier.height(24.dp))
                 DisplayTasks(
                     modifier = Modifier.weight(1f),
                     tasks = completedTask,
                     showActive = false,
-                    onComplete = {task, completed ->},
-                    onDelete = {task ->}
+                    onComplete = {task, completed ->
+                        viewModel.setAction(
+                            action = TaskAction.SetCompleted(task,completed)
+                        )
+                    },
+                    onDelete = {task ->
+                        viewModel.setAction(
+                            action = TaskAction.Delete(task)
+                        )
+                    }
                 )
             }
 
@@ -143,7 +160,7 @@ fun DisplayTasks(
             }
         )
     }
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = modifier.fillMaxWidth()) {
         Text(
             modifier = Modifier.padding(horizontal = 12.dp),
             text = if (showActive) "Active Task" else "Completed Tasks",
@@ -158,7 +175,7 @@ fun DisplayTasks(
                 if (it.isNotEmpty()) {
                     LazyColumn(modifier = Modifier.padding(horizontal = 24.dp)) {
                         items(
-                            it, key = { task -> task._id },
+                            it, key = { task -> task._id.toHexString() },
                         ) { task ->
                             TaskView(
                                 showActive = showActive,

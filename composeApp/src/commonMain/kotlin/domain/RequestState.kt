@@ -2,17 +2,12 @@ package domain
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ContentTransform
-import androidx.compose.animation.core.SnapSpec
-import androidx.compose.animation.core.TransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import cafe.adriel.voyager.core.screen.Screen
 
 sealed class RequestState<out T> {
     data object Idle :RequestState<Nothing>()
@@ -24,7 +19,7 @@ sealed class RequestState<out T> {
     fun isSuccess() = this is Success
     fun isError() = this is Error
 
-    fun getSuccessData() = (this as Success).data
+    private fun getSuccessData() = (this as Success).data
     fun getSuccessDataOrNull():T?{
         return try {
             (this as Success).data
@@ -32,7 +27,7 @@ sealed class RequestState<out T> {
             null
         }
     }
-    fun getErrorMessage() = (this as Error).message
+    private fun getErrorMessage() = (this as Error).message
     fun getErrorMessageOrEmpty():String{
         return try {
             (this as Error).message
